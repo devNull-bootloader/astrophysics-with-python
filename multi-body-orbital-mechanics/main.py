@@ -8,6 +8,8 @@ G = 6.67430e-11  # gravitational constant
 dt = 60 * 60 * 24  # 1 day per frame
 frame_count = 0
 sun_gravity_on = True  # Sun gravity toggle
+paused = False  # Pause toggle
+elapsed_days = 0  # Simulation time tracker
 
 # --- Planet data ---
 planets = [
@@ -20,7 +22,9 @@ planets = [
     {"name": "Mars", "pos": [1.52 * 1.496e11, 0], "vel": [0, 24077],
      "mass": 6.417e23, "mass_on": True, "x_path": [], "y_path": [], "color": "red"},
     {"name": "Jupiter", "pos": [5.2 * 1.496e11, 0], "vel": [0, 13070],
-     "mass": 1.898e27, "mass_on": True, "x_path": [], "y_path": [], "color": "brown"}
+     "mass": 1.898e27, "mass_on": True, "x_path": [], "y_path": [], "color": "brown"},
+    {"name": "Saturn", "pos": [9.537 * 1.496e11, 0], "vel": [0, 9690],
+     "mass": 5.683e26, "mass_on": True, "x_path": [], "y_path": [], "color": "goldenrod"}
 ]
 
 # --- Store initial positions/velocities for reset ---
@@ -68,8 +72,11 @@ def update_positions():
 
 # --- Animation ---
 def animate(frame):
-    global frame_count
+    global frame_count, elapsed_days
+    if paused:
+        return
     frame_count += 1
+    elapsed_days += dt / (60 * 60 * 24)
     ax.clear()
     ax.set_facecolor("black")
     ax.set_aspect('equal', adjustable='box')
@@ -97,14 +104,24 @@ def animate(frame):
         # Planet glow halo
         planet_alpha = 0.1 + 0.05 * (math.sin(frame_count * 0.1) + 1) / 2
         ax.scatter(p["pos"][0], p["pos"][1], color=p["color"], s=150, alpha=planet_alpha, zorder=2)
+        # Planet name label
+        ax.text(p["pos"][0], p["pos"][1], f" {p['name']}", color=p["color"],
+                fontsize=6, va='center', zorder=5)
+
+    # Elapsed time display
+    years = elapsed_days / 365.25
+    ax.text(0.02, 0.97, f"Time: {years:.2f} years", transform=ax.transAxes,
+            color='white', fontsize=9, va='top')
 
 # --- Button callbacks ---
 def reset(event):
+    global elapsed_days
     for i, p in enumerate(planets):
         p["pos"] = initial_states[i]["pos"][:]
         p["vel"] = initial_states[i]["vel"][:]
         p["x_path"].clear()
         p["y_path"].clear()
+    elapsed_days = 0
 
 def toggle_mass(planet_index):
     def inner(event):
@@ -119,10 +136,20 @@ def toggle_sun_gravity(event):
     status = "ON" if sun_gravity_on else "OFF"
     print(f"Sun gravity toggled {status}")
 
+def toggle_pause(event):
+    global paused
+    paused = not paused
+    status = "PAUSED" if paused else "RUNNING"
+    print(f"Simulation {status}")
+
 # --- Add buttons ---
 ax_reset = plt.axes([0.81, 0.05, 0.1, 0.05])
 btn_reset = Button(ax_reset, 'Reset')
 btn_reset.on_clicked(reset)
+
+ax_pause = plt.axes([0.81, 0.12, 0.1, 0.05])
+btn_pause = Button(ax_pause, 'Pause/Play')
+btn_pause.on_clicked(toggle_pause)
 
 # Buttons for each planet
 for i, p in enumerate(planets):
@@ -131,7 +158,7 @@ for i, p in enumerate(planets):
     btn.on_clicked(toggle_mass(i))
 
 # Sun gravity toggle button
-ax_sun = plt.axes([0.81, 0.12, 0.1, 0.05])
+ax_sun = plt.axes([0.81, 0.19, 0.1, 0.05])
 btn_sun = Button(ax_sun, "Sun Gravity")
 btn_sun.on_clicked(toggle_sun_gravity)
 

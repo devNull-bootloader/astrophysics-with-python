@@ -17,8 +17,8 @@ A beautiful Python simulation of planets orbiting a star, powered by **Newton’
    ```bash
    pip install matplotlib numpy
    ```
-2. Install dependencies:
+2. Run the simulation:
    ```bash
-   pip install matplotlib numpy
+   python main.py
    ```
 # 💡 Made for space lovers & future astrophysicists.   

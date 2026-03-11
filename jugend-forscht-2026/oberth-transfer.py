@@ -152,7 +152,7 @@ v[N1+Nt1+Nt2:] = np.sqrt(mu * (2 / r[N1+Nt1+Nt2:] - 1 / a2))
 energy = 0.5 * v**2 - mu / r
 
 # ================== FIGURE ==================
-fig = plt.figure(figsize=(11, 6))
+fig = plt.figure(figsize=(14, 8))
 gs = fig.add_gridspec(2, 2)
 
 ax_orbit = fig.add_subplot(gs[:, 0])
@@ -161,7 +161,7 @@ ax_energy = fig.add_subplot(gs[1, 1])
 
 # ================== ORBIT VIEW ==================
 ax_orbit.set_aspect('equal')
-lim = ra2 * 1.15
+lim = ra2 * 1.1
 ax_orbit.set_xlim(-lim, lim)
 ax_orbit.set_ylim(-lim, lim)
 ax_orbit.set_title("Oberth-Transfer (elliptisch)")
@@ -222,13 +222,19 @@ if is_streamlit:
     import streamlit as st
 
     update(N_total - 1)
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=True)
     plt.close(fig)
 elif plt.get_backend().lower().endswith('agg'):
     update(N_total - 1)
     plt.savefig("oberth-transfer.png", dpi=150)
     plt.close(fig)
 else:
+    manager = plt.get_current_fig_manager()
+    try:
+        manager.full_screen_toggle()
+    except Exception:
+        pass
+
     anim = FuncAnimation(
         fig,
         update,

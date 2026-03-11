@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import sys
 
 # ================== CONSTANTS ==================
 mu = 3.986e14
@@ -116,13 +117,26 @@ def update(i):
     line_e.set_data(np.arange(i), energy[:i])
     return sat, line_v, line_e
 
-anim = FuncAnimation(
-    fig,
-    update,
-    frames=len(x),
-    interval=20,
-    blit=False
-)
-
 plt.tight_layout()
-plt.show()
+
+is_streamlit = "streamlit" in sys.modules
+
+if is_streamlit:
+    import streamlit as st
+
+    update(len(x) - 1)
+    st.pyplot(fig)
+    plt.close(fig)
+elif plt.get_backend().lower().endswith('agg'):
+    update(len(x) - 1)
+    plt.savefig("hohmann-transfer.png", dpi=150)
+    plt.close(fig)
+else:
+    anim = FuncAnimation(
+        fig,
+        update,
+        frames=len(x),
+        interval=20,
+        blit=False
+    )
+    plt.show()

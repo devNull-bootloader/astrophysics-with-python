@@ -222,7 +222,7 @@ if is_streamlit:
     import streamlit as st
 
     update(N_total - 1)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig, width='stretch')
     plt.close(fig)
 elif plt.get_backend().lower().endswith('agg'):
     update(N_total - 1)

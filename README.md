@@ -55,5 +55,3 @@ More projects to come soon:
 
 If you're a student, mentor, or space nerd who wants to connect — feel free to reach out or follow my progress!
 
-E-Mail: urvishlanje25@gmail.com
-
